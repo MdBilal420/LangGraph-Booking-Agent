@@ -1,0 +1,11 @@
+pandas
+requests
+numpy
+langchain-core
+langchain-google-genai
+python-dotenv
+pytz
+typing-extensions
+langgraph
+langchain-groq
+langchain-tavily

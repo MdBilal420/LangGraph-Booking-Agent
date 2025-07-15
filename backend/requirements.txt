@@ -9,3 +9,6 @@ typing-extensions
 langgraph
 langchain-groq
 langchain-tavily
+fastapi
+uvicorn
+pydantic

@@ -37,11 +37,9 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
 LANGSMITH_TRACING = os.getenv("LANGSMITH_TRACING", "true").lower() == "true"
 LANGSMITH_ENDPOINT = os.getenv("LANGSMITH_ENDPOINT", "https://api.smith.langchain.com")
-LANGSMITH_PROJECT = os.getenv("LANGSMITH_PROJECT", "Chatbot Agent API")
+LANGSMITH_PROJECT = os.getenv("LANGSMITH_PROJECT", "Booking-Agent-LC")
 if not all([GROQ_API_KEY, GOOGLE_API_KEY, TAVILY_API_KEY, LANGSMITH_API_KEY, LANGSMITH_TRACING, LANGSMITH_ENDPOINT, LANGSMITH_PROJECT]):
     raise ValueError("Please set the required environment variables: GROQ_API_KEY, GOOGLE_API_KEY, TAVILY_API_KEY")
-
-
 
 
 

@@ -73,6 +73,7 @@ async def root():
         "timestamp": datetime.now()
     }
 
+
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
     """

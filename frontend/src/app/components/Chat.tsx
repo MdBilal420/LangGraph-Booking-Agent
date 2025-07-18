@@ -14,7 +14,7 @@ export default function Chat() {
   const [input, setInput] = useState<string>('')
   const [threadId, setThreadId] = useState<string | null>(null)
   const [passengerId, setPassengerId] = useState<string>('') // Initialize as empty string
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://langgraph-booking-agent.onrender.com'
 
   const suggestedQuestions = [
     'Hi there, what time is my flight?',

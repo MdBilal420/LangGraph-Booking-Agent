@@ -43,10 +43,6 @@ export default function SuggestedQuestions({ onQuestionSelect, isVisible }: Sugg
 
   return (
     <div className="w-full max-w-4xl animate-fade-in">
-      <h3 className="text-lg font-medium text-white/80 mb-4 text-center">
-        Popular questions to get you started:
-      </h3>
-      
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {SUGGESTED_QUESTIONS.map((question, index) => (
           <button
@@ -59,28 +55,28 @@ export default function SuggestedQuestions({ onQuestionSelect, isVisible }: Sugg
               <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-600/20 flex items-center justify-center group-hover:from-blue-500/30 group-hover:to-purple-600/30 transition-all duration-300">
                 <span className="text-lg">{question.icon}</span>
               </div>
-              
+
               <div className="flex-1 min-w-0">
-                <div className="text-xs text-blue-300/70 font-medium mb-1 uppercase tracking-wide">
+                <div className="text-xs text-blue-700 font-medium mb-1 uppercase tracking-wide">
                   {question.category}
                 </div>
-                <div className="text-white text-sm leading-relaxed group-hover:text-white/90 transition-colors">
+                <div className="text-gray-800 text-sm leading-relaxed group-hover:text-black transition-colors">
                   {question.text}
                 </div>
               </div>
             </div>
-            
+
             {/* Hover indicator */}
             <div className="mt-3 flex items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <span className="text-blue-300 text-xs">Click to ask →</span>
+              <span className="text-blue-700 text-xs">Click to ask →</span>
             </div>
           </button>
         ))}
       </div>
-      
+
       {/* Additional help text */}
       <div className="mt-6 text-center">
-        <p className="text-white/50 text-sm">
+        <p className="text-gray-700 text-sm">
           Or type your own question in the chat box below
         </p>
       </div>

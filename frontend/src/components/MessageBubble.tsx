@@ -19,10 +19,10 @@ export default function MessageBubble({ message, isLatest = false }: MessageBubb
         {/* Avatar */}
         {!isUser && (
           <div className="flex items-center mb-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center mr-2">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-blue-400 flex items-center justify-center mr-2">
               <span className="text-white text-sm">🤖</span>
             </div>
-            <span className="text-white/60 text-xs">Travel Assistant</span>
+            <span className="text-gray-800 text-xs">Travel Assistant</span>
           </div>
         )}
         
@@ -38,7 +38,7 @@ export default function MessageBubble({ message, isLatest = false }: MessageBubb
           `}
         >
           {/* Message Content */}
-          <div className="text-white leading-relaxed whitespace-pre-wrap">
+          <div className="text-gray-900 leading-relaxed whitespace-pre-wrap">
             {message.content}
           </div>
           
@@ -51,7 +51,7 @@ export default function MessageBubble({ message, isLatest = false }: MessageBubb
           )}
           
           {/* Timestamp */}
-          <div className={`mt-2 text-xs text-white/50 ${isUser ? 'text-right' : 'text-left'}`}>
+          <div className={`mt-2 text-xs text-gray-700 ${isUser ? 'text-right' : 'text-left'}`}>
             {timestamp}
           </div>
         </div>
@@ -59,8 +59,8 @@ export default function MessageBubble({ message, isLatest = false }: MessageBubb
         {/* User Avatar */}
         {isUser && (
           <div className="flex items-center justify-end mt-2">
-            <span className="text-white/60 text-xs mr-2">You</span>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <span className="text-gray-600 text-xs mr-2">You</span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
               <span className="text-white text-sm">👤</span>
             </div>
           </div>

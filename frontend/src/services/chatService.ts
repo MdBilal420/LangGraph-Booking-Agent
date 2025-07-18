@@ -14,7 +14,7 @@ class ChatService {
   private axiosInstance;
 
   constructor() {
-    this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://langgraph-booking-agent.onrender.com';
+    this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://fastapi-app-1061397264130.us-central1.run.app';
     this.axiosInstance = axios.create({
       baseURL: this.baseURL,
       timeout: 30000,

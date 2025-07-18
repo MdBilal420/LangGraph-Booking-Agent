@@ -24,10 +24,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph, START
 
-
-
-
-
 # Load environment variables
 load_dotenv()
 
@@ -41,27 +37,76 @@ LANGSMITH_PROJECT = os.getenv("LANGSMITH_PROJECT", "Booking-Agent-LC")
 if not all([GROQ_API_KEY, GOOGLE_API_KEY, TAVILY_API_KEY, LANGSMITH_API_KEY, LANGSMITH_TRACING, LANGSMITH_ENDPOINT, LANGSMITH_PROJECT]):
     raise ValueError("Please set the required environment variables: GROQ_API_KEY, GOOGLE_API_KEY, TAVILY_API_KEY")
 
+# Global variables for lazy initialization
+_db = None
+_retriever = None
+_part_1_graph = None
+_memory = None
 
+def _initialize_database():
+    """Initialize database and update dates"""
+    global _db
+    
+    if _db is not None:
+        return _db
+    
+    db_url = "https://storage.googleapis.com/benchmarks-artifacts/travel-db/travel2.sqlite"
+    local_file = "travel2.sqlite"
+    backup_file = "travel2.backup.sqlite"
+    overwrite = False
+    
+    if overwrite or not os.path.exists(local_file):
+        response = requests.get(db_url)
+        response.raise_for_status()
+        with open(local_file, "wb") as f:
+            f.write(response.content)
+        shutil.copy(local_file, backup_file)
+    
+    _db = update_dates(local_file)
+    return _db
 
-db_url = "https://storage.googleapis.com/benchmarks-artifacts/travel-db/travel2.sqlite"
-local_file = "travel2.sqlite"
-# The backup lets us restart for each tutorial section
-backup_file = "travel2.backup.sqlite"
-overwrite = False
-if overwrite or not os.path.exists(local_file):
-    response = requests.get(db_url)
-    response.raise_for_status()  # Ensure the request was successful
-    with open(local_file, "wb") as f:
-        f.write(response.content)
-    # Backup - we will use this to "reset" our DB in each section
-    shutil.copy(local_file, backup_file)
+def _initialize_retriever():
+    """Initialize FAQ retriever"""
+    global _retriever
+    
+    if _retriever is not None:
+        return _retriever
+    
+    # Fetch and split the FAQ document
+    response = requests.get(
+        "https://storage.googleapis.com/benchmarks-artifacts/travel-db/swiss_faq.md"
+    )
+    response.raise_for_status()
+    faq_text = response.text
+    docs = [{"page_content": txt} for txt in re.split(r"(?=\n##)", faq_text)]
+
+    # Use Google Generative AI Embeddings
+    embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+    _retriever = VectorStoreRetriever.from_docs(docs, embedding_model)
+    return _retriever
+
+def _initialize_graph():
+    """Initialize the LangGraph components"""
+    global _part_1_graph, _memory
+    
+    if _part_1_graph is not None:
+        return _part_1_graph, _memory
+    
+    # Initialize database and retriever first
+    db = _initialize_database()
+    retriever = _initialize_retriever()
+    
+    # The graph is created at the end of the file
+    # If we get here, it means the graph hasn't been created yet
+    # This should only happen during import, so we'll return None
+    # and let the actual graph creation happen at the end of the file
+    return None, None
 
 class State(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
-builder = StateGraph(State)
-
 def update_dates(file):
+    backup_file = "travel2.backup.sqlite"
     shutil.copy(backup_file, file)
     conn = sqlite3.connect(file)
     cursor = conn.cursor()
@@ -104,21 +149,6 @@ def update_dates(file):
 
     return file
 
-
-db = update_dates(local_file)
-
-
-# Fetch and split the FAQ document
-response = requests.get(
-    "https://storage.googleapis.com/benchmarks-artifacts/travel-db/swiss_faq.md"
-)
-response.raise_for_status()
-faq_text = response.text
-docs = [{"page_content": txt} for txt in re.split(r"(?=\n##)", faq_text)]
-
-# Use Google Generative AI Embeddings
-embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-
 class VectorStoreRetriever:
     def __init__(self, docs: list, vectors: list, embedding_client):
         self._arr = np.array(vectors)
@@ -140,13 +170,27 @@ class VectorStoreRetriever:
             {**self._docs[idx], "similarity": scores[idx]} for idx in top_k_idx_sorted
         ]
 
-# Instantiate the retriever with Google embeddings
-retriever = VectorStoreRetriever.from_docs(docs, embedding_model)
+# Lazy-loaded properties
+def get_db():
+    return _initialize_database()
+
+def get_retriever():
+    return _initialize_retriever()
+
+def get_graph():
+    return _initialize_graph()
+
+# For backward compatibility - these will be initialized when needed
+db = None
+retriever = None
+part_1_graph = None
+memory = None
 
 @tool
 def lookup_policy(query: str) -> str:
     """Consult the company policies to check whether certain options are permitted.
     Use this before making any flight changes or performing other 'write' events."""
+    retriever = get_retriever()
     results = retriever.query(query, k=2)
     return "\n\n".join([doc["page_content"] for doc in results])
 
@@ -168,6 +212,8 @@ def fetch_user_flight_information(config: RunnableConfig) -> list[dict]:
     if not passenger_id:
         raise ValueError("No passenger ID configured.")
 
+    db = get_db()
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -204,6 +250,8 @@ def search_flights(
     limit: int = 20,
 ) -> list[dict]:
     """Search for flights based on departure airport, arrival airport, and departure time range."""
+    db = get_db()
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -248,6 +296,7 @@ def update_ticket_to_new_flight(
     if not passenger_id:
         raise ValueError("No passenger ID configured.")
 
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -314,6 +363,7 @@ def cancel_ticket(ticket_no: str, *, config: RunnableConfig) -> str:
     passenger_id = configuration.get("passenger_id", None)
     if not passenger_id:
         raise ValueError("No passenger ID configured.")
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -368,6 +418,7 @@ def search_car_rentals(
     Returns:
         list[dict]: A list of car rental dictionaries matching the search criteria.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -403,6 +454,7 @@ def book_car_rental(rental_id: int) -> str:
     Returns:
         str: A message indicating whether the car rental was successfully booked or not.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -434,6 +486,7 @@ def update_car_rental(
     Returns:
         str: A message indicating whether the car rental was successfully updated or not.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -468,6 +521,7 @@ def cancel_car_rental(rental_id: int) -> str:
     Returns:
         str: A message indicating whether the car rental was successfully cancelled or not.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -505,6 +559,7 @@ def search_hotels(
     Returns:
         list[dict]: A list of hotel dictionaries matching the search criteria.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -539,6 +594,7 @@ def book_hotel(hotel_id: int) -> str:
     Returns:
         str: A message indicating whether the hotel was successfully booked or not.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -570,6 +626,7 @@ def update_hotel(
     Returns:
         str: A message indicating whether the hotel was successfully updated or not.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -604,6 +661,7 @@ def cancel_hotel(hotel_id: int) -> str:
     Returns:
         str: A message indicating whether the hotel was successfully cancelled or not.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -637,6 +695,7 @@ def search_trip_recommendations(
     Returns:
         list[dict]: A list of trip recommendation dictionaries matching the search criteria.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -676,6 +735,7 @@ def book_excursion(recommendation_id: int) -> str:
     Returns:
         str: A message indicating whether the trip recommendation was successfully booked or not.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -704,6 +764,7 @@ def update_excursion(recommendation_id: int, details: str) -> str:
     Returns:
         str: A message indicating whether the trip recommendation was successfully updated or not.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -732,6 +793,7 @@ def cancel_excursion(recommendation_id: int) -> str:
     Returns:
         str: A message indicating whether the trip recommendation was successfully cancelled or not.
     """
+    db = get_db()
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -863,6 +925,9 @@ part_1_assistant_runnable = primary_assistant_prompt | llm.bind_tools(part_1_too
 
 
 
+# Create the graph
+builder = StateGraph(State)
+
 # Define nodes: these do the work
 builder.add_node("assistant", Assistant(part_1_assistant_runnable))
 builder.add_node("tools", create_tool_node_with_fallback(part_1_tools))
@@ -878,6 +943,12 @@ builder.add_edge("tools", "assistant")
 # this is a complete memory for the entire graph.
 memory = MemorySaver()
 part_1_graph = builder.compile(checkpointer=memory)
+
+# Update global variables for lazy loading
+_db = get_db()
+_retriever = get_retriever()
+_part_1_graph = part_1_graph
+_memory = memory
 
 
 import shutil

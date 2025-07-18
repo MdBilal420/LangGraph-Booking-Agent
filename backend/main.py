@@ -21,7 +21,7 @@ from models import (
     HistoryResponse, HealthResponse, ErrorResponse
 )
 from agent_service import AgentService
-from database import db_manager
+from database import DatabaseManager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -51,8 +51,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize agent service
+# Initialize services
 agent_service = AgentService()
+db_manager = DatabaseManager()
 
 @app.get("/")
 async def root():
@@ -276,4 +277,5 @@ async def get_conversation_history(thread_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)

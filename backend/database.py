@@ -209,5 +209,5 @@ class DatabaseManager:
             logger.error(f"Query execution failed: {str(e)}")
             raise Exception(f"Database query failed: {str(e)}")
 
-# Global database manager instance
-db_manager = DatabaseManager()
+# Remove the global database manager instance
+# db_manager = DatabaseManager()

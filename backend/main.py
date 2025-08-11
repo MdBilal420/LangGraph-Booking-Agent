@@ -175,9 +175,13 @@ async def chat(request: ChatRequest):
                 detail="message is required and cannot be empty"
             )
         
+        messages = await agent_service.get_conversation_history(request.thread_id)
+
+        last_message = messages[-1] if messages else ""
+
         # Process message through agent
         response = await agent_service.process_message(
-            message=request.message,
+            message= last_message + request.message,
             passenger_id=request.passenger_id,
             thread_id=request.thread_id
         )

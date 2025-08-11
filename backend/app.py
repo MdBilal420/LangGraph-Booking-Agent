@@ -20,6 +20,7 @@ from typing_extensions import TypedDict
 from langgraph.graph.message import AnyMessage, add_messages
 from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_tavily import TavilySearch
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.checkpoint.memory import MemorySaver
@@ -52,8 +53,8 @@ def _initialize_database():
         return _db
     
     db_url = "https://storage.googleapis.com/benchmarks-artifacts/travel-db/travel2.sqlite"
-    local_file = "travel2.sqlite"
-    backup_file = "travel2.backup.sqlite"
+    local_file = "travel2_updated.sqlite"
+    backup_file = "travel2.sqlite"
     overwrite = False
     
     if overwrite or not os.path.exists(local_file):
@@ -875,12 +876,20 @@ class Assistant:
 
 
 # Replace this with ChatGroq
+# llm = ChatOpenAI(
+#     model="gpt-4o",
+#     temperature=0,
+#     max_tokens=None,
+#     timeout=None,
+#     max_retries=2,
+# )
+
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
     temperature=0,
     max_tokens=None,
     timeout=None,
-    max_retries=2,
+    max_retries=2, 
 )
 
 primary_assistant_prompt = ChatPromptTemplate.from_messages(

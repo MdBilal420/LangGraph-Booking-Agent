@@ -52,7 +52,7 @@ def _initialize_database():
     if _db is not None:
         return _db
     
-    db_url = "https://storage.googleapis.com/benchmarks-artifacts/travel-db/travel2.sqlite"
+    db_url = "https://storage.googleapis.com/travel_agent_db/travel2_updated.sqlite"
     local_file = "travel2_updated.sqlite"
     backup_file = "travel2.sqlite"
     overwrite = False

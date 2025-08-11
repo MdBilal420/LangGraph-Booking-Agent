@@ -19,6 +19,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from typing_extensions import TypedDict
 from langgraph.graph.message import AnyMessage, add_messages
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_tavily import TavilySearch
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.checkpoint.memory import MemorySaver
@@ -874,11 +875,10 @@ class Assistant:
 
 
 # Replace this with ChatGroq
-llm = ChatGroq(
-    model="deepseek-r1-distill-llama-70b",
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
     temperature=0,
     max_tokens=None,
-    reasoning_format="parsed",
     timeout=None,
     max_retries=2,
 )

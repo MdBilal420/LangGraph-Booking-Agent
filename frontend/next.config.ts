@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
   // Enable compression
   compress: true,
   
+  // Ensure trailing slashes for better compatibility
+  trailingSlash: false,
+  
   // Environment variables
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://langgraph-booking-agent.onrender.com',

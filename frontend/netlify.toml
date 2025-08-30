@@ -13,6 +13,12 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# SPA fallback - redirect all routes to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 # Headers for better performance
 [[headers]]
   for = "/*"

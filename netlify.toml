@@ -1,0 +1,32 @@
+[build]
+  # Base directory for the build (where package.json is located)
+  base = "frontend"
+  
+  # Build command
+  command = "npm run build"
+  
+  # Publish directory
+  publish = "frontend/.next"
+
+[build.environment]
+  # Node.js version
+  NODE_VERSION = "18"
+
+# Use the Next.js plugin
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# SPA fallback - redirect all routes to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for better performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

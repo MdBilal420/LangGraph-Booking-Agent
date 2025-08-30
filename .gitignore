@@ -3,3 +3,11 @@ backend/.venv
 .env
 .DS_Store
 node_modules
+
+
+frontend/.next
+
+backend/__pycache__
+backend/.DS_Store
+# Local Netlify folder
+.netlify

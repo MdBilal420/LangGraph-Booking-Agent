@@ -8,13 +8,13 @@ from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 from langgraph.checkpoint.memory import MemorySaver
 from models import ChatResponse, ToolCall, Message, HealthResponse
 
-# Import agent components from app.py
-from app import (
-    part_1_graph, 
-    memory,
-    db,
-    update_dates
-)
+# Remove the problematic imports at module level
+# from app import (
+#     part_1_graph, 
+#     memory,
+#     db,
+#     update_dates
+# )
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +23,44 @@ class AgentService:
     
     def __init__(self):
         """Initialize the agent service"""
-        self.graph = part_1_graph
-        self.memory = memory
-        self.db_path = db
+        # Lazy load components to avoid startup issues
+        self._graph = None
+        self._memory = None
+        self._db_path = None
+        self._update_dates = None
         logger.info("Agent service initialized successfully")
+    
+    def _get_components(self):
+        """Lazy load components from app.py"""
+        if self._graph is None:
+            try:
+                from app import part_1_graph, memory, db, update_dates
+                self._graph = part_1_graph
+                self._memory = memory
+                self._db_path = db
+                self._update_dates = update_dates
+                logger.info("Successfully loaded agent components")
+            except Exception as e:
+                logger.error(f"Failed to load agent components: {str(e)}")
+                raise Exception(f"Failed to load agent components: {str(e)}")
+    
+    @property
+    def graph(self):
+        """Get the graph component"""
+        self._get_components()
+        return self._graph
+    
+    @property
+    def memory(self):
+        """Get the memory component"""
+        self._get_components()
+        return self._memory
+    
+    @property
+    def db_path(self):
+        """Get the database path"""
+        self._get_components()
+        return self._db_path
     
     async def process_message(
         self, 

@@ -8,6 +8,7 @@ pytz
 typing-extensions
 langgraph
 langchain-groq
+langchain-openai
 langchain-tavily
 fastapi
 uvicorn

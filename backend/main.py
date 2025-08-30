@@ -21,7 +21,7 @@ from models import (
     HistoryResponse, HealthResponse, ErrorResponse
 )
 from agent_service import AgentService
-from database import db_manager
+from database import DatabaseManager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -42,14 +42,18 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3000", 
+    ],  # Configure appropriately for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Initialize agent service
+# Initialize services
 agent_service = AgentService()
+db_manager = DatabaseManager()
 
 @app.get("/")
 async def root():
@@ -69,6 +73,7 @@ async def root():
         },
         "timestamp": datetime.now()
     }
+
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
@@ -170,9 +175,13 @@ async def chat(request: ChatRequest):
                 detail="message is required and cannot be empty"
             )
         
+        messages = await agent_service.get_conversation_history(request.thread_id)
+
+        last_message = messages[-1] if messages else ""
+
         # Process message through agent
         response = await agent_service.process_message(
-            message=request.message,
+            message= last_message + request.message,
             passenger_id=request.passenger_id,
             thread_id=request.thread_id
         )
@@ -272,4 +281,5 @@ async def get_conversation_history(thread_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)

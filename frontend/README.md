@@ -1,219 +1,253 @@
-# Travel Agent - Glassmorphic Chatbot UI
+# LangGraph Booking Agent - Frontend
 
-A modern, futuristic chatbot interface built with Next.js that connects to the FastAPI travel agent backend. Features a beautiful glassmorphic design with smooth animations and responsive layouts.
+## Overview
 
-## Features
+A modern, responsive React frontend for the LangGraph-based travel booking agent. Built with Next.js 15, TypeScript, and Tailwind CSS, this application provides an intuitive chat interface for users to interact with the AI travel assistant.
 
-- 🎨 **Glassmorphic Design**: Modern glass-like UI with transparency effects
-- 🚀 **Futuristic Aesthetics**: Blue/purple/teal gradients with floating particles
-- 📱 **Responsive Design**: Optimized for mobile, tablet, and desktop
-- 💬 **Real-time Chat**: Smooth messaging with typing indicators
-- 🎯 **Suggested Questions**: Quick-start options for common travel queries
-- 🔄 **Thread Persistence**: Conversations saved across browser sessions
-- ♿ **Accessibility**: WCAG compliant with keyboard navigation
-- 🧪 **Comprehensive Testing**: Unit and integration tests included
+## Technology Stack
 
-## Quick Start
-
-### Prerequisites
-
-- Node.js 18+ installed
-- FastAPI backend running on `http://localhost:8000`
-
-### Installation
-
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Set up environment variables:**
-   ```bash
-   # .env.local is already configured with:
-   NEXT_PUBLIC_API_URL=http://localhost:8000
-   ```
-
-3. **Start development server:**
-   ```bash
-   npm run dev
-   ```
-
-4. **Open your browser:**
-   Navigate to `http://localhost:3000`
-
-## Available Scripts
-
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run test` - Run Jest tests
-- `npm run test:watch` - Run tests in watch mode
-- `npm run test:coverage` - Run tests with coverage report
-
-## Usage
-
-### Basic Chat Flow
-
-1. **Welcome Screen**: Shows suggested questions when you first visit
-2. **Ask Questions**: Click suggested questions or type your own
-3. **View Responses**: See agent responses with tool call indicators
-4. **Continue Conversation**: Messages persist in the current thread
-5. **New Chat**: Click "New Chat" to start a fresh conversation
-
-### Suggested Questions
-
-The interface includes pre-configured questions for common travel scenarios:
-
-- "What time is my flight?"
-- "Can I change my flight to next week?"
-- "What hotels are available at my destination?"
-- "What are my car rental options?"
-- "What recommendations do you have for excursions?"
-- "What about lodging and transportation?"
-
-### Passenger ID
-
-The app uses a fixed passenger ID (`3442 587242`) as specified in the requirements. This is automatically included in all API requests.
+- **Next.js 15.4.1**: React framework with App Router
+- **React 19.1.0**: Latest React with concurrent features
+- **TypeScript**: Type-safe development
+- **Tailwind CSS 4**: Utility-first CSS framework
+- **Axios**: HTTP client for API communication
+- **React Markdown**: Markdown rendering for AI responses
 
 ## Architecture
 
-### Component Structure
+### Core Components
 
 ```
 src/
 ├── app/                    # Next.js App Router
-├── components/            # React components
+│   ├── components/         # App-level components
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Home page
+├── components/            # Reusable UI components
 │   ├── ChatContainer.tsx  # Main chat interface
-│   ├── ChatHeader.tsx     # Header with title and controls
-│   ├── MessageList.tsx    # Message display area
+│   ├── ChatHeader.tsx     # Header with branding
+│   ├── ChatInput.tsx      # Message input component
+│   ├── MessageList.tsx    # Message display
 │   ├── MessageBubble.tsx  # Individual message component
-│   ├── SuggestedQuestions.tsx # Question cards
-│   ├── ChatInput.tsx      # Message input field
-│   ├── TypingIndicator.tsx # Typing animation
-│   ├── ToolCallIndicator.tsx # Tool usage display
-│   └── ErrorBoundary.tsx  # Error handling
+│   ├── SuggestedQuestions.tsx # Quick action buttons
+│   ├── TypingIndicator.tsx # Loading animation
+│   └── ToolCallIndicator.tsx # Tool execution status
 ├── contexts/              # React Context providers
 │   └── ChatContext.tsx    # Chat state management
-├── services/              # API communication
-│   └── chatService.ts     # Backend integration
-├── types/                 # TypeScript definitions
+├── services/              # API service layer
+│   └── chatService.ts     # Backend communication
+├── types/                 # TypeScript type definitions
 │   ├── chat.ts           # Chat-related types
 │   └── components.ts     # Component prop types
-└── __tests__/            # Test files
+└── utils/                 # Utility functions
 ```
 
-### State Management
+## Key Features
 
-The app uses React Context for state management with the following features:
+### 1. **Real-time Chat Interface**
+- Streaming message updates
+- Typing indicators
+- Tool call status display
+- Error handling with retry mechanisms
 
-- **Message History**: Stores all chat messages
-- **Thread Management**: Handles conversation threads
-- **Loading States**: Manages UI loading indicators
-- **Error Handling**: Centralized error state
-- **Persistence**: Saves state to localStorage
+### 2. **State Management**
+- React Context for global state
+- Local storage persistence
+- Thread-based conversation management
+- Passenger ID configuration
 
-### API Integration
+### 3. **Responsive Design**
+- Mobile-first approach
+- Glass morphism UI design
+- Adaptive layouts for all screen sizes
+- Touch-friendly interactions
 
-The `chatService` handles all backend communication:
+### 4. **User Experience**
+- Suggested questions for quick start
+- Message history persistence
+- Loading states and animations
+- Error recovery and feedback
 
-- **Send Messages**: POST to `/chat` endpoint
-- **Create Threads**: POST to `/chat/new` endpoint
-- **Get History**: GET from `/chat/{thread_id}/history`
-- **Health Checks**: GET from `/health` endpoint
-- **Error Handling**: Automatic retry and error parsing
+## Component Breakdown
 
-## Styling
+### ChatContainer
+The main orchestrator component that:
+- Manages the overall chat layout
+- Handles message sending and receiving
+- Displays suggested questions for new users
+- Shows error states and recovery options
 
-### Glassmorphic Design System
+### ChatContext
+Global state management providing:
+- Message history and thread management
+- Loading states and error handling
+- Passenger ID configuration
+- Local storage persistence
 
-The app uses custom Tailwind CSS utilities for glassmorphic effects:
+### ChatService
+API communication layer with:
+- RESTful API integration
+- Automatic retry mechanisms
+- Error handling and timeout management
+- Health check capabilities
 
-- `.glass-card` - Basic glass container
-- `.glass-user` - User message styling (blue gradient)
-- `.glass-assistant` - Assistant message styling (emerald/blue gradient)
-- `.glass-input` - Input field styling
-- `.glass-button` - Button styling
-- `.glass-suggestion` - Suggestion card styling
+## Environment Configuration
 
-### Responsive Breakpoints
+### Required Environment Variables
 
-- **Mobile**: 320px - 768px (single column, touch-optimized)
-- **Tablet**: 768px - 1024px (optimized touch targets)
-- **Desktop**: 1024px+ (full feature set)
+```bash
+NEXT_PUBLIC_API_URL=https://your-backend-url.com
+```
+
+### Development Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Run tests
+npm test
+```
+
+## API Integration
+
+### Backend Communication
+
+The frontend communicates with the LangGraph backend through:
+
+- **Chat Endpoint**: `/chat` - Send messages and receive responses
+- **Thread Management**: `/chat/new` - Create new conversation threads
+- **History Retrieval**: `/chat/{threadId}/history` - Load conversation history
+- **Health Checks**: `/health` - Service availability monitoring
+
+### Message Flow
+
+1. **User Input** → ChatInput component
+2. **State Update** → ChatContext dispatch
+3. **API Call** → ChatService.sendMessage()
+4. **Response Processing** → Message parsing and display
+5. **UI Update** → MessageList and TypingIndicator
+
+## Styling & Design
+
+### Tailwind CSS Configuration
+
+- Custom glass morphism effects
+- Responsive breakpoints
+- Dark/light mode support
+- Custom animations and transitions
+
+### Design System
+
+- **Colors**: Consistent color palette with semantic meaning
+- **Typography**: Readable fonts with proper hierarchy
+- **Spacing**: Consistent spacing scale
+- **Components**: Reusable UI patterns
 
 ## Testing
 
-### Running Tests
+### Test Setup
+
+- **Jest**: Test runner
+- **React Testing Library**: Component testing
+- **User Event**: Interaction testing
+- **Coverage**: Code coverage reporting
+
+### Test Commands
 
 ```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run with coverage
-npm run test:coverage
+npm test              # Run all tests
+npm run test:watch    # Watch mode
+npm run test:coverage # Coverage report
 ```
 
-### Test Coverage
+## Performance Optimizations
 
-- **Components**: MessageBubble, SuggestedQuestions
-- **Services**: ChatService API methods
-- **Integration**: Full chat flow testing
+### 1. **Code Splitting**
+- Next.js automatic code splitting
+- Dynamic imports for heavy components
+- Route-based chunking
+
+### 2. **Caching**
+- Local storage for conversation persistence
+- Service worker for offline support
+- API response caching
+
+### 3. **Bundle Optimization**
+- Tree shaking for unused code
+- Image optimization
+- CSS purging
 
 ## Deployment
 
-### Production Build
+### Netlify Deployment
+
+The application is configured for Netlify deployment with:
+
+- **Build Command**: `npm run build`
+- **Publish Directory**: `out/`
+- **Environment Variables**: Configured in Netlify dashboard
+
+### Build Process
 
 ```bash
+# Static export for Netlify
 npm run build
-npm start
+npm run export  # Generates static files in out/
 ```
 
-### Environment Variables
+## Development Guidelines
 
-For production deployment, set:
+### Code Style
 
-```bash
-NEXT_PUBLIC_API_URL=https://your-api-domain.com
-```
+- **TypeScript**: Strict type checking enabled
+- **ESLint**: Code quality enforcement
+- **Prettier**: Code formatting
+- **Conventional Commits**: Git commit messages
+
+### Component Patterns
+
+- **Functional Components**: With hooks
+- **Props Interface**: TypeScript interfaces for all props
+- **Error Boundaries**: Graceful error handling
+- **Loading States**: Consistent loading patterns
+
+### State Management
+
+- **Context API**: For global state
+- **Local State**: For component-specific state
+- **Persistence**: Local storage for important data
+- **Optimistic Updates**: For better UX
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **API Connection Failed**
-   - Ensure FastAPI backend is running on port 8000
-   - Check CORS settings in backend
-   - Verify API URL in environment variables
+1. **API Connection**: Check `NEXT_PUBLIC_API_URL` environment variable
+2. **Build Errors**: Ensure all TypeScript types are properly defined
+3. **Styling Issues**: Verify Tailwind CSS configuration
+4. **Performance**: Monitor bundle size and loading times
 
-2. **Build Errors**
-   - Run `npm run lint` to check for code issues
-   - Ensure all TypeScript types are properly defined
-   - Check for missing dependencies
+### Debug Mode
 
-3. **Styling Issues**
-   - Verify Tailwind CSS is properly configured
-   - Check for conflicting CSS classes
-   - Ensure glassmorphic utilities are loaded
-
-### Performance Tips
-
-- The app includes automatic code splitting
-- Images are optimized with Next.js Image component
-- Bundle size is optimized with tree shaking
-- Service worker caching is available for offline support
+Enable debug logging by setting:
+```bash
+NODE_ENV=development
+```
 
 ## Contributing
 
-1. Follow the existing code style and patterns
-2. Add tests for new components and features
-3. Ensure accessibility compliance
-4. Test on multiple devices and browsers
-5. Update documentation for new features
-
-## License
-
-This project is part of the Travel Agent system and follows the same licensing terms.
+1. Follow TypeScript best practices
+2. Write tests for new components
+3. Update documentation for API changes
+4. Ensure responsive design compatibility
+5. Test across different browsers and devices

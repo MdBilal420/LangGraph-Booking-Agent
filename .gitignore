@@ -9,3 +9,5 @@ frontend/.next
 
 backend/__pycache__
 backend/.DS_Store
+# Local Netlify folder
+.netlify

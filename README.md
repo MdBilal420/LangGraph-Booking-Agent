@@ -1,6 +1,6 @@
 # LangGraph Booking Agent
 
-> **LangGraph AI travel agent with 18+ tools for flight, hotel, car, and excursion booking using Google AI.**
+> **LangGraph AI travel agent with 15+ tools for flight, hotel, car, and excursion booking using Google AI.**
 
 A sophisticated full-stack travel booking system that combines the power of LangGraph, Google Generative AI, and modern web technologies to provide an intelligent conversational interface for comprehensive travel management.
 

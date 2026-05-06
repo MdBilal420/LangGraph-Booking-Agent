@@ -181,7 +181,7 @@ async def chat(request: ChatRequest):
 
         # Process message through agent
         response = await agent_service.process_message(
-            message= last_message + request.message,
+            message=request.message,
             passenger_id=request.passenger_id,
             thread_id=request.thread_id
         )

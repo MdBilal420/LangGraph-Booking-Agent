@@ -9,6 +9,8 @@ import uuid
 
 from langchain_core.tools import tool
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+# from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from dotenv import load_dotenv
 from datetime import date, datetime
 from typing import Optional, Union, Annotated
@@ -83,7 +85,8 @@ def _initialize_retriever():
     docs = [{"page_content": txt} for txt in re.split(r"(?=\n##)", faq_text)]
 
     # Use Google Generative AI Embeddings
-    embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+    # embedding_model = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2-preview")
+    embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")    
     _retriever = VectorStoreRetriever.from_docs(docs, embedding_model)
     return _retriever
 
@@ -876,21 +879,21 @@ class Assistant:
 
 
 # Replace this with ChatGroq
-# llm = ChatOpenAI(
-#     model="gpt-4o",
+llm = ChatOpenAI(
+    model="gpt-4o",
+    temperature=0,
+    max_tokens=None,
+    timeout=None,
+    max_retries=2,
+)
+
+# llm = ChatGroq(
+#     model="llama-3.3-70b-versatile",
 #     temperature=0,
 #     max_tokens=None,
 #     timeout=None,
 #     max_retries=2,
 # )
-
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0,
-    max_tokens=None,
-    timeout=None,
-    max_retries=2, 
-)
 
 primary_assistant_prompt = ChatPromptTemplate.from_messages(
     [

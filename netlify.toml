@@ -1,28 +1,19 @@
 [build]
-  # Base directory for the build (where package.json is located)
+  # Base directory where package.json lives
   base = "frontend"
   
-  # Build command
+  # Build command (runs inside frontend/)
   command = "npm run build"
-  
-  # Publish directory
-  publish = "frontend/.next"
 
 [build.environment]
-  # Node.js version
-  NODE_VERSION = "18"
+  # Node.js version - Next.js 15 prefers Node 20
+  NODE_VERSION = "20"
 
-# Use the Next.js plugin
+# Use the official Next.js plugin for SSR support
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# SPA fallback - redirect all routes to index.html
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-# Headers for better performance
+# Security headers
 [[headers]]
   for = "/*"
   [headers.values]

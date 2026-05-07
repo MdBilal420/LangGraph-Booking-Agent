@@ -4,8 +4,8 @@ import { ChatProvider } from "@/contexts/ChatContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
-  title: "Travel Agent - AI Assistant",
-  description: "Your intelligent travel companion for flight bookings, hotels, and travel planning",
+  title: "WanderAI - Your AI Travel Assistant",
+  description: "Plan trips, book flights, find hotels, and explore destinations with your intelligent travel companion",
 };
 
 export default function RootLayout({
@@ -14,31 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
         <ErrorBoundary>
-          <div className="futuristic-bg min-h-screen">
-            {/* Floating particles background */}
-            <div className="particles">
-              {Array.from({ length: 20 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="particle"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    animationDelay: `${Math.random() * 20}s`,
-                    animationDuration: `${15 + Math.random() * 10}s`,
-                  }}
-                />
-              ))}
-            </div>
-            
-            <ChatProvider>
-              <main className="relative z-10">
-                {children}
-              </main>
-            </ChatProvider>
-          </div>
+          <ChatProvider>
+            {children}
+          </ChatProvider>
         </ErrorBoundary>
       </body>
     </html>

@@ -33,29 +33,29 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="glass-card p-8 max-w-md w-full text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+          <div className="p-8 max-w-md w-full text-center rounded-2xl border border-border bg-card shadow-lg">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-100 dark:bg-red-950/50 flex items-center justify-center">
               <span className="text-2xl">⚠️</span>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">
+            <h2 className="text-xl font-semibold text-foreground mb-2">
               Something went wrong
             </h2>
-            <p className="text-white/70 mb-6">
+            <p className="text-muted-foreground mb-6">
               We encountered an unexpected error. Please refresh the page to try again.
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="glass-button px-6 py-2 rounded-lg text-white font-medium hover:scale-105 transform transition-all duration-200"
+              className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
             >
               Refresh Page
             </button>
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="mt-4 text-left">
-                <summary className="text-white/60 text-sm cursor-pointer">
+                <summary className="text-muted-foreground text-sm cursor-pointer">
                   Error Details (Development)
                 </summary>
-                <pre className="mt-2 text-xs text-red-300 bg-red-500/10 p-2 rounded overflow-auto">
+                <pre className="mt-2 text-xs text-red-400 bg-red-950/20 p-2 rounded-lg overflow-auto">
                   {this.state.error.stack}
                 </pre>
               </details>

@@ -10,9 +10,10 @@ const initialState: ChatState = {
   currentThreadId: null,
   isLoading: false,
   error: null,
-  passengerId: '3442 587242', // Fixed passenger ID as requested
+  passengerId: '3442 587242',
   showSuggestions: true,
   isTyping: false,
+  sidebarOpen: false,
 };
 
 // Action types
@@ -25,7 +26,9 @@ type ChatAction =
   | { type: 'SET_TYPING'; payload: boolean }
   | { type: 'SET_SHOW_SUGGESTIONS'; payload: boolean }
   | { type: 'CLEAR_MESSAGES' }
-  | { type: 'SET_PASSENGER_ID'; payload: string };
+  | { type: 'SET_PASSENGER_ID'; payload: string }
+  | { type: 'SET_SIDEBAR_OPEN'; payload: boolean }
+  | { type: 'TOGGLE_SIDEBAR' };
 
 // Reducer
 function chatReducer(state: ChatState, action: ChatAction): ChatState {
@@ -48,6 +51,10 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return { ...state, messages: [], showSuggestions: true };
     case 'SET_PASSENGER_ID':
       return { ...state, passengerId: action.payload };
+    case 'SET_SIDEBAR_OPEN':
+      return { ...state, sidebarOpen: action.payload };
+    case 'TOGGLE_SIDEBAR':
+      return { ...state, sidebarOpen: !state.sidebarOpen };
     default:
       return state;
   }
@@ -202,6 +209,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
     showSuggestions: () => {
       dispatch({ type: 'SET_SHOW_SUGGESTIONS', payload: true });
+    },
+    toggleSidebar: () => {
+      dispatch({ type: 'TOGGLE_SIDEBAR' });
+    },
+    setSidebarOpen: (open: boolean) => {
+      dispatch({ type: 'SET_SIDEBAR_OPEN', payload: open });
     },
   };
 

@@ -4,11 +4,26 @@ export interface ToolCall {
   result: unknown;
 }
 
+export type MessageContentType = 'text' | 'destination' | 'flight' | 'hotel' | 'itinerary';
+
+export interface MessageContent {
+  type: MessageContentType;
+  data: unknown;
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
   tool_calls?: ToolCall[] | null;
+  contentType?: MessageContentType;
+}
+
+export interface ChatThread {
+  id: string;
+  title: string;
+  date: string;
+  messages: number;
 }
 
 export interface ChatResponse {
@@ -53,6 +68,7 @@ export interface ChatState {
   passengerId: string;
   showSuggestions: boolean;
   isTyping: boolean;
+  sidebarOpen: boolean;
 }
 
 export interface ChatActions {
@@ -63,6 +79,8 @@ export interface ChatActions {
   setIsTyping: (typing: boolean) => void;
   hideSuggestions: () => void;
   showSuggestions: () => void;
+  toggleSidebar: () => void;
+  setSidebarOpen: (open: boolean) => void;
 }
 
 export interface ApiError {

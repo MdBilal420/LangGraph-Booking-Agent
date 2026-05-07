@@ -1,21 +1,36 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChatInputProps } from '@/types/components';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Paperclip, Mic, Loader2 } from 'lucide-react';
+import { cn } from '@/utils/cn';
 
-export default function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatInputProps) {
+interface ChatInputProps {
+  onSendMessage: (message: string) => void;
+  isLoading: boolean;
+  disabled?: boolean;
+  placeholder?: string;
+}
+
+export default function ChatInput({
+  onSendMessage,
+  isLoading,
+  disabled = false,
+  placeholder = 'Where do you want to travel?',
+}: ChatInputProps) {
   const [message, setMessage] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
     }
   }, [message]);
 
-  // Focus textarea on mount
+  // Focus on mount
   useEffect(() => {
     if (textareaRef.current && !disabled) {
       textareaRef.current.focus();
@@ -27,6 +42,9 @@ export default function ChatInput({ onSendMessage, isLoading, disabled = false }
     if (message.trim() && !isLoading && !disabled) {
       onSendMessage(message.trim());
       setMessage('');
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
     }
   };
 
@@ -37,86 +55,110 @@ export default function ChatInput({ onSendMessage, isLoading, disabled = false }
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value);
-  };
-
-  const isDisabled = disabled || isLoading;
-  const canSend = message.trim().length > 0 && !isDisabled;
+  const canSend = message.trim().length > 0 && !disabled && !isLoading;
 
   return (
-    <form onSubmit={handleSubmit} className="glass-card p-4">
-      <div className="flex items-end space-x-4">
-        {/* Message Input */}
-        <div className="flex-1 relative">
-          <textarea
-            ref={textareaRef}
-            value={message}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            placeholder={isLoading ? "Sending..." : "Type your message here..."}
-            disabled={isDisabled}
-            rows={1}
-            className="w-full glass-input rounded-xl px-4 py-3 text-gray-900 placeholder-gray-700 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Type your message"
-            aria-describedby="input-help"
-            style={{
-              minHeight: '48px',
-              maxHeight: '120px'
-            }}
-          />
-
-          {/* Character count (optional) */}
-          {message.length > 100 && (
-            <div className="absolute bottom-1 right-2 text-xs text-gray-700">
-              {message.length}/1000
-            </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.1 }}
+      className={cn(
+        'px-4 py-4 border-t border-border',
+        'bg-background/80 backdrop-blur-md'
+      )}
+    >
+      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
+        <div
+          className={cn(
+            'relative flex items-end gap-2 rounded-2xl border bg-card p-2 shadow-sm',
+            'transition-all duration-200',
+            isFocused && 'ring-2 ring-ring/50 border-ring/30 shadow-md'
           )}
+        >
+          {/* Textarea */}
+          <div className="flex-1 min-w-0 py-2">
+            <textarea
+              ref={textareaRef}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder={isLoading ? 'AI is responding...' : placeholder}
+              disabled={disabled || isLoading}
+              rows={1}
+              className={cn(
+                'w-full resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60',
+                'focus:outline-none disabled:opacity-50 focus-visible:outline-none focus-visible:black',
+                'min-h-[20px] max-h-[160px]'
+              )}
+              aria-label="Type your message"
+            />
+          </div>
+
+          {/* Voice button */}
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            disabled={isLoading}
+            className="p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors disabled:opacity-40 hidden sm:flex"
+            aria-label="Voice input"
+            title="Coming soon"
+          >
+            <Mic size={18} />
+          </motion.button>
+
+          {/* Send button */}
+          <motion.button
+            type="submit"
+            disabled={!canSend}
+            whileHover={canSend ? { scale: 1.05 } : {}}
+            whileTap={canSend ? { scale: 0.95 } : {}}
+            className={cn(
+              'p-2.5 rounded-xl flex items-center justify-center transition-all duration-200',
+              canSend
+                ? 'bg-primary text-primary-foreground shadow-sm hover:shadow-md'
+                : 'bg-muted text-muted-foreground/40'
+            )}
+            aria-label={isLoading ? 'Sending' : 'Send message'}
+          >
+            <AnimatePresence mode="wait">
+              {isLoading ? (
+                <motion.div
+                  key="loading"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Loader2 size={18} className="animate-spin" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="send"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Send size={18} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </div>
 
-        {/* Send Button */}
-        <button
-          type="submit"
-          disabled={!canSend}
-          aria-label={isLoading ? "Sending message" : "Send message"}
-          className={`
-            flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400/50
-            ${canSend
-              ? 'glass-button hover:scale-105 transform'
-              : 'bg-white/5 border border-white/10 cursor-not-allowed opacity-50'
-            }
-          `}
+        {/* Footer hint */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-center text-[11px] text-muted-foreground/50 mt-2"
         >
-          {isLoading ? (
-            <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-700 rounded-full animate-spin"></div>
-          ) : (
-            <svg
-              className="w-5 h-5 text-gray-800"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-              />
-            </svg>
-          )}
-        </button>
-      </div>
-
-      {/* Help Text */}
-      <div id="input-help" className="mt-2 flex items-center justify-between text-xs text-gray-700">
-        <span>Press Enter to send, Shift+Enter for new line</span>
-        {isLoading && (
-          <span className="flex items-center space-x-1">
-            <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
-            <span>Processing...</span>
-          </span>
-        )}
-      </div>
-    </form>
+          Press Enter to send, Shift + Enter for new line
+        </motion.p>
+      </form>
+    </motion.div>
   );
 }

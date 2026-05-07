@@ -1,172 +1,157 @@
-"use client";
+'use client';
 
-import React from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { MessageBubbleProps } from "@/types/components";
-import ToolCallIndicator from "./ToolCallIndicator";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { User, Sparkles, Copy, Check } from 'lucide-react';
+import { cn } from '@/utils/cn';
+import { useStreamingText } from '@/hooks/useStreamingText';
+import { MessageBubbleProps } from '@/types/components';
+import ToolCallIndicator from './ToolCallIndicator';
 
-export default function MessageBubble({
-  message,
-  isLatest = false,
-}: MessageBubbleProps) {
-  const isUser = message.role === "user";
+export default function MessageBubble({ message, isLatest = false }: MessageBubbleProps) {
+  const isUser = message.role === 'user';
   const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
+    hour: '2-digit',
+    minute: '2-digit',
   });
 
+  const [copied, setCopied] = useState(false);
+
+  const { displayedText, isComplete } = useStreamingText({
+    text: message.content,
+    speed: 8,
+    enabled: isLatest && !isUser && message.content.length > 0,
+  });
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(message.content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const displayContent = isLatest && !isUser ? displayedText : message.content;
+
   return (
-    <div
-      className={`flex ${
-        isUser ? "justify-end" : "justify-start"
-      } mb-4 animate-slide-up`}
+    <motion.div
+      initial={{ opacity: 0, y: 16, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className={cn('flex mb-5', isUser ? 'justify-end' : 'justify-start')}
     >
-      <div className={`max-w-[80%] ${isUser ? "order-2" : "order-1"}`}>
+      <div className={cn('flex gap-3 max-w-[85%] lg:max-w-[75%]', isUser ? 'flex-row-reverse' : 'flex-row')}>
         {/* Avatar */}
-        {!isUser && (
-          <div className="flex items-center mb-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-blue-400 flex items-center justify-center mr-2">
-              <span className="text-white text-sm">🤖</span>
-            </div>
-            <span className="text-gray-800 text-xs">Travel Assistant</span>
-          </div>
-        )}
-
-        {/* Message Bubble */}
-        <div
-          className={`
-            p-4 rounded-2xl shadow-lg
-            ${
-              isUser
-                ? "glass-user rounded-br-md ml-4"
-                : "glass-assistant rounded-bl-md mr-4"
-            }
-            ${isLatest ? "animate-fade-in" : ""}
-          `}
-        >
-          {/* Message Content */}
-          <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                // Custom styling for markdown elements
-                h1: ({ children }) => (
-                  <h1 className="text-lg font-bold mb-2 text-gray-900">
-                    {children}
-                  </h1>
-                ),
-                h2: ({ children }) => (
-                  <h2 className="text-base font-semibold mb-2 text-gray-900">
-                    {children}
-                  </h2>
-                ),
-                h3: ({ children }) => (
-                  <h3 className="text-sm font-medium mb-1 text-gray-900">
-                    {children}
-                  </h3>
-                ),
-                p: ({ children }) => (
-                  <p className="mb-2 last:mb-0 text-gray-900">{children}</p>
-                ),
-                ul: ({ children }) => (
-                  <ul className="list-disc list-inside mb-2 text-gray-900">
-                    {children}
-                  </ul>
-                ),
-                ol: ({ children }) => (
-                  <ol className="list-decimal list-inside mb-2 text-gray-900">
-                    {children}
-                  </ol>
-                ),
-                li: ({ children }) => (
-                  <li className="mb-1 text-gray-900">{children}</li>
-                ),
-                code: ({ children, className }) => {
-                  const isInline = !className;
-                  return isInline ? (
-                    <code className="bg-gray-200 px-1 py-0.5 rounded text-sm font-mono text-gray-800">
-                      {children}
-                    </code>
-                  ) : (
-                    <code
-                      className={`block bg-gray-100 p-3 rounded-lg text-sm font-mono overflow-x-auto text-gray-800 ${className}`}
-                    >
-                      {children}
-                    </code>
-                  );
-                },
-                pre: ({ children }) => (
-                  <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-2">
-                    {children}
-                  </pre>
-                ),
-                blockquote: ({ children }) => (
-                  <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-700 mb-2">
-                    {children}
-                  </blockquote>
-                ),
-                a: ({ children, href }) => (
-                  <a
-                    href={href}
-                    className="text-blue-600 hover:text-blue-800 underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {children}
-                  </a>
-                ),
-                table: ({ children }) => (
-                  <div className="overflow-x-auto mb-2">
-                    <table className="min-w-full border-collapse border border-gray-300">
-                      {children}
-                    </table>
-                  </div>
-                ),
-                th: ({ children }) => (
-                  <th className="border border-gray-300 px-2 py-1 bg-gray-100 font-semibold text-left">
-                    {children}
-                  </th>
-                ),
-                td: ({ children }) => (
-                  <td className="border border-gray-300 px-2 py-1">
-                    {children}
-                  </td>
-                ),
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
-          </div>
-
-          {/* Tool Calls */}
-          {message.tool_calls && message.tool_calls.length > 0 && (
-            <ToolCallIndicator
-              toolCalls={message.tool_calls}
-              isVisible={true}
-            />
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.25 }}
+          className={cn(
+            'w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm',
+            isUser
+              ? 'bg-gradient-to-br from-primary to-teal-500'
+              : 'bg-gradient-to-br from-primary/80 to-teal-400'
           )}
+        >
+          {isUser ? (
+            <User size={14} className="text-white" />
+          ) : (
+            <Sparkles size={14} className="text-white" />
+          )}
+        </motion.div>
 
-          {/* Timestamp */}
-          <div
-            className={`mt-2 text-xs text-gray-700 ${
-              isUser ? "text-right" : "text-left"
-            }`}
+        {/* Bubble */}
+        <div className="flex flex-col gap-1">
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05, duration: 0.3 }}
+            className={cn(
+              'relative px-4 py-3 rounded-2xl shadow-sm',
+              'prose prose-sm max-w-none',
+              isUser
+                ? 'bg-primary text-primary-foreground rounded-tr-sm'
+                : 'bg-card text-card-foreground border border-border rounded-tl-sm'
+            )}
           >
-            {timestamp}
+            <div
+              className={cn(
+                'prose-sm max-w-none leading-relaxed',
+                isUser
+                  ? 'prose-invert [&_*]:text-primary-foreground'
+                  : '[&_*]:text-card-foreground'
+              )}
+            >
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
+                  ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-0.5">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-0.5">{children}</ol>,
+                  li: ({ children }) => <li className="text-sm">{children}</li>,
+                  code: ({ children, className }) => {
+                    const isInline = !className;
+                    return isInline ? (
+                      <code className={cn(
+                        'px-1 py-0.5 rounded text-xs font-mono',
+                        isUser ? 'bg-white/20' : 'bg-muted'
+                      )}>
+                        {children}
+                      </code>
+                    ) : (
+                      <pre className={cn(
+                        'block p-3 rounded-lg text-xs font-mono overflow-x-auto my-2',
+                        isUser ? 'bg-white/10' : 'bg-muted'
+                      )}>
+                        <code>{children}</code>
+                      </pre>
+                    );
+                  },
+                  a: ({ children, href }) => (
+                    <a href={href} target="_blank" rel="noopener noreferrer" className="underline opacity-90 hover:opacity-100">
+                      {children}
+                    </a>
+                  ),
+                }}
+              >
+                {displayContent}
+              </ReactMarkdown>
+
+              {/* Streaming cursor */}
+              {isLatest && !isUser && !isComplete && (
+                <motion.span
+                  animate={{ opacity: [1, 0] }}
+                  transition={{ duration: 0.6, repeat: Infinity }}
+                  className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
+                />
+              )}
+            </div>
+
+            {/* Tool Calls */}
+            {message.tool_calls && message.tool_calls.length > 0 && (
+              <ToolCallIndicator toolCalls={message.tool_calls} isVisible={true} />
+            )}
+          </motion.div>
+
+          {/* Footer row */}
+          <div className={cn('flex items-center gap-2', isUser ? 'justify-end pr-1' : 'justify-start pl-1')}>
+            <span className="text-[10px] text-muted-foreground/70">{timestamp}</span>
+            {!isUser && isComplete && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleCopy}
+                className="p-1 rounded-md text-muted-foreground/50 hover:text-muted-foreground hover:bg-secondary transition-colors"
+                aria-label="Copy message"
+              >
+                {copied ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+              </motion.button>
+            )}
           </div>
         </div>
-
-        {/* User Avatar */}
-        {isUser && (
-          <div className="flex items-center justify-end mt-2">
-            <span className="text-gray-600 text-xs mr-2">You</span>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-              <span className="text-white text-sm">👤</span>
-            </div>
-          </div>
-        )}
       </div>
-    </div>
+    </motion.div>
   );
 }

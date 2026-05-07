@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useChat } from '@/contexts/ChatContext';
-import ChatHeader from './ChatHeader';
 import MessageList from './MessageList';
 import SuggestedQuestions from './SuggestedQuestions';
 import ChatInput from './ChatInput';
+import { AlertCircle, X } from 'lucide-react';
+import { cn } from '@/utils/cn';
 
 export default function ChatContainer() {
   const { state, actions } = useChat();
@@ -19,58 +21,56 @@ export default function ChatContainer() {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-4xl h-screen flex flex-col">
-      {/* Chat Header */}
-      <ChatHeader />
-      
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-h-0 mt-4 sm:mt-6">
-        {/* Messages Container */}
-        <div className="flex-1 glass-card p-4 sm:p-6 mb-4 sm:mb-6 overflow-hidden flex flex-col">
-          {state.messages.length === 0 && state.showSuggestions ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-center px-2">
-              <div className="mb-6 sm:mb-8">
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
-                  Welcome to your Travel Assistant
-                </h2>
-                <p className="text-gray-600 text-base sm:text-lg">
-                  I&apos;m here to help you with flights, hotels, and travel planning
-                </p>
-              </div>
-              
-              <SuggestedQuestions 
-                onQuestionSelect={handleQuestionSelect}
-                isVisible={state.showSuggestions}
-              />
-            </div>
-          ) : (
-            <MessageList />
-          )}
-        </div>
-        
-        {/* Chat Input */}
-        <ChatInput 
-          onSendMessage={handleSendMessage}
-          isLoading={state.isLoading}
-          disabled={state.isLoading}
-        />
-      </div>
-      
-      {/* Error Display */}
-      {state.error && (
-        <div className="mt-4 p-3 sm:p-4 glass-card border-red-300 bg-red-50">
-          <div className="flex items-start justify-between">
-            <p className="text-red-600 text-sm flex-1 pr-2">{state.error}</p>
-            <button
-              onClick={() => actions.setError(null)}
-              className="text-red-500 hover:text-red-700 flex-shrink-0 w-6 h-6 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-400 rounded"
-              aria-label="Dismiss error"
-            >
-              ✕
-            </button>
+    <div className="flex flex-col h-full">
+      {/* Messages area */}
+      <div className="flex-1 min-h-0 flex flex-col">
+        {state.messages.length === 0 && state.showSuggestions ? (
+          <div className="h-full flex flex-col items-center justify-center px-4 py-8 max-w-3xl mx-auto w-full">
+            <SuggestedQuestions
+              onQuestionSelect={handleQuestionSelect}
+              isVisible={state.showSuggestions}
+            />
           </div>
-        </div>
-      )}
+        ) : (
+          <MessageList />
+        )}
+      </div>
+
+      {/* Error display */}
+      <AnimatePresence>
+        {state.error && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: 10, height: 0 }}
+            className="px-4 max-w-3xl mx-auto w-full"
+          >
+            <div className={cn(
+              'flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-900 p-3'
+            )}>
+              <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700 dark:text-red-400 flex-1">{state.error}</p>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => actions.setError(null)}
+                className="p-1 rounded-md text-red-400 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors flex-shrink-0"
+                aria-label="Dismiss error"
+              >
+                <X size={14} />
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Chat Input */}
+      <ChatInput
+        onSendMessage={handleSendMessage}
+        isLoading={state.isLoading}
+        disabled={state.isLoading}
+        placeholder="Where do you want to travel?"
+      />
     </div>
   );
 }

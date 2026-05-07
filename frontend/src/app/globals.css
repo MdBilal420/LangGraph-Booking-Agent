@@ -2,15 +2,91 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f9fa;
-  --foreground: #1a1a2a;
+  --background: #fafafa;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #0f766e;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #525252;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+  --accent-foreground: #171717;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #0f766e;
+  --radius: 0.75rem;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #171717;
+  --sidebar-border: #e5e5e5;
+  --chat-user: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+  --chat-assistant: #f8fafc;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #171717;
+  --card-foreground: #fafafa;
+  --popover: #171717;
+  --popover-foreground: #fafafa;
+  --primary: #14b8a6;
+  --primary-foreground: #0a0a0a;
+  --secondary: #262626;
+  --secondary-foreground: #e5e5e5;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #fafafa;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #262626;
+  --input: #262626;
+  --ring: #14b8a6;
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #fafafa;
+  --sidebar-border: #262626;
+  --chat-user: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+  --chat-assistant: #171717;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
   --font-sans: 'Inter', system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -18,125 +94,82 @@ body {
   color: var(--foreground);
   font-family: 'Inter', system-ui, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Glassmorphic utility classes */
-@layer components {
-  .glass-card {
-    @apply bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl shadow-sm;
-  }
-  
-  .glass-user {
-    @apply bg-gradient-to-br from-blue-100 to-blue-200 backdrop-blur-md border border-blue-200;
-  }
-  
-  .glass-assistant {
-    @apply bg-gradient-to-br from-emerald-50 to-blue-100 backdrop-blur-md border border-emerald-200;
-  }
-  
-  .glass-input {
-    @apply bg-white/90 backdrop-blur-md border border-gray-200 focus:border-blue-400 focus:bg-white;
-  }
-  
-  .glass-button {
-    @apply bg-gradient-to-r from-blue-100 to-blue-200 backdrop-blur-md border border-blue-200 hover:from-blue-200 hover:to-blue-300 hover:border-blue-300 transition-all duration-300;
-  }
-  
-  .glass-suggestion {
-    @apply bg-white/80 backdrop-blur-md border border-gray-100 hover:bg-white hover:border-gray-200 transition-all duration-300;
-  }
-}
-
-/* Background gradient */
-.futuristic-bg {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 25%, #dee2e6 50%, #ced4da 75%, #f8f9fa 100%);
-  background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Floating particles effect */
-.particles {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: rgba(59, 130, 246, 0.2);
-  border-radius: 50%;
-  animation: float 20s infinite linear;
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(100vh) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100vh) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* Scrollbar styling */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 3px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.2);
+  background: rgba(128, 128, 128, 0.25);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.4);
+  background: rgba(128, 128, 128, 0.4);
 }
 
-/* Typing indicator animation */
-.typing-dot {
-  animation: pulseDots 1.4s ease-in-out infinite;
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
 }
 
-.typing-dot:nth-child(1) { animation-delay: 0s; }
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes pulseDots {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* Smooth transitions */
-* {
-  transition: background-color 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
-}
-
-/* Focus styles for accessibility */
-.focus-visible:focus {
-  outline: 2px solid rgba(59, 130, 246, 0.5);
+/* Focus visible */
+/* :focus-visible {
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
+} */
+
+/* Selection */
+::selection {
+  background: rgba(15, 118, 110, 0.2);
+}
+
+.dark ::selection {
+  background: rgba(20, 184, 166, 0.25);
+}
+
+/* Glassmorphism utility */
+@layer components {
+  .glass {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .dark .glass {
+    background: rgba(23, 23, 23, 0.6);
+  }
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .dark .glass-strong {
+    background: rgba(23, 23, 23, 0.85);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

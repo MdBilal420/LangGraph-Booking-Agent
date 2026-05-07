@@ -46,7 +46,7 @@ export default function MessageList() {
             transition={{ delay: 0.3 }}
             className="text-sm text-muted-foreground"
           >
-            Start a conversation to plan your trip
+            Ask about your flights, hotels, car rentals, or trip recommendations
           </motion.p>
         </div>
       </motion.div>

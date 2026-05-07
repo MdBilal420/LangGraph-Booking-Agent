@@ -8,9 +8,12 @@ import { User, Sparkles, Copy, Check } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useStreamingText } from '@/hooks/useStreamingText';
 import { MessageBubbleProps } from '@/types/components';
+import { useChat } from '@/contexts/ChatContext';
 import ToolCallIndicator from './ToolCallIndicator';
+import FollowUpChips from './FollowUpChips';
 
 export default function MessageBubble({ message, isLatest = false }: MessageBubbleProps) {
+  const { actions } = useChat();
   const isUser = message.role === 'user';
   const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
     hour: '2-digit',
@@ -150,6 +153,15 @@ export default function MessageBubble({ message, isLatest = false }: MessageBubb
               </motion.button>
             )}
           </div>
+
+          {/* Follow-up suggestions */}
+          {!isUser && isLatest && isComplete && (
+            <FollowUpChips
+              toolCalls={message.tool_calls}
+              onSuggestionClick={(suggestion) => actions.sendMessage(suggestion)}
+              isVisible={true}
+            />
+          )}
         </div>
       </div>
     </motion.div>

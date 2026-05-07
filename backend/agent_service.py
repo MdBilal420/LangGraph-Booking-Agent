@@ -102,9 +102,10 @@ class AgentService:
                 stream_mode="values"
             )
             
-            # Collect the final response
+            # Collect the final response and tool calls
             final_response = None
             tool_calls_made = []
+            seen_tool_call_ids = set()
             
             for event in events:
                 if "messages" in event:
@@ -114,15 +115,22 @@ class AgentService:
                         if hasattr(last_message, 'content') and last_message.content:
                             if hasattr(last_message, 'type') and last_message.type == 'ai':
                                 final_response = last_message.content
-                            
-                            # Extract tool calls if present
-                            if hasattr(last_message, 'tool_calls') and last_message.tool_calls:
-                                for tool_call in last_message.tool_calls:
-                                    tool_calls_made.append(ToolCall(
-                                        name=tool_call.get('name', ''),
-                                        args=tool_call.get('args', {}),
-                                        result=None  # We don't have access to results in this context
-                                    ))
+                        
+                        # Extract tool calls from ALL AI messages (not just last)
+                        for msg in messages:
+                            if hasattr(msg, 'type') and msg.type == 'ai':
+                                if hasattr(msg, 'tool_calls') and msg.tool_calls:
+                                    for tool_call in msg.tool_calls:
+                                        tc_id = tool_call.get('id')
+                                        if tc_id and tc_id in seen_tool_call_ids:
+                                            continue
+                                        if tc_id:
+                                            seen_tool_call_ids.add(tc_id)
+                                        tool_calls_made.append(ToolCall(
+                                            name=tool_call.get('name', ''),
+                                            args=tool_call.get('args', {}),
+                                            result=None
+                                        ))
             
             if not final_response:
                 final_response = "I apologize, but I couldn't process your request properly. Please try again."

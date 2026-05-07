@@ -22,13 +22,13 @@ class DatabaseManager:
         self.db_path = db_path
         self.backup_path = "travel2.backup.sqlite"
         self.db_url = "https://storage.googleapis.com/benchmarks-artifacts/travel-db/travel2.sqlite"
-        
-        # Initialize database if needed
-        self._initialize_database()
+        self._initialized = False
         logger.info(f"Database manager initialized with path: {db_path}")
     
-    def _initialize_database(self):
-        """Initialize the database by downloading and setting up if needed"""
+    def _ensure_initialized(self):
+        """Lazy initialize the database on first use"""
+        if self._initialized:
+            return
         try:
             # Download database if it doesn't exist
             if not os.path.exists(self.db_path):
@@ -45,6 +45,7 @@ class DatabaseManager:
             
             # Update dates to current time
             self.update_dates()
+            self._initialized = True
             
         except Exception as e:
             logger.error(f"Failed to initialize database: {str(e)}")
@@ -58,6 +59,7 @@ class DatabaseManager:
             Path to the updated database file
         """
         try:
+            self._ensure_initialized()
             # Restore from backup
             if os.path.exists(self.backup_path):
                 shutil.copy(self.backup_path, self.db_path)
@@ -122,6 +124,7 @@ class DatabaseManager:
         Yields:
             SQLite connection object
         """
+        self._ensure_initialized()
         conn = None
         try:
             conn = sqlite3.connect(self.db_path)
@@ -143,6 +146,7 @@ class DatabaseManager:
             True if database is healthy, False otherwise
         """
         try:
+            self._ensure_initialized()
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 
@@ -179,6 +183,7 @@ class DatabaseManager:
             List of column information or None if table doesn't exist
         """
         try:
+            self._ensure_initialized()
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute(f"PRAGMA table_info({table_name})")
@@ -200,6 +205,7 @@ class DatabaseManager:
             List of query results
         """
         try:
+            self._ensure_initialized()
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute(query, params)

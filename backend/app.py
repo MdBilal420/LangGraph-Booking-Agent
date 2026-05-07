@@ -6,6 +6,9 @@ import requests
 import re
 import numpy as np
 import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 from langchain_core.tools import tool
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -56,7 +59,7 @@ def _initialize_database():
     
     db_url = "https://storage.googleapis.com/travel_agent_db/travel2_updated.sqlite"
     local_file = "travel2_updated.sqlite"
-    backup_file = "travel2.sqlite"
+    backup_file = "travel2.backup.sqlite"
     overwrite = False
     
     if overwrite or not os.path.exists(local_file):
@@ -174,16 +177,6 @@ class VectorStoreRetriever:
         return [
             {**self._docs[idx], "similarity": scores[idx]} for idx in top_k_idx_sorted
         ]
-
-# Lazy-loaded properties
-def get_db():
-    return _initialize_database()
-
-def get_retriever():
-    return _initialize_retriever()
-
-def get_graph():
-    return _initialize_graph()
 
 # For backward compatibility - these will be initialized when needed
 db = None
@@ -956,11 +949,44 @@ builder.add_edge("tools", "assistant")
 memory = MemorySaver()
 part_1_graph = builder.compile(checkpointer=memory)
 
-# Update global variables for lazy loading
-_db = get_db()
-_retriever = get_retriever()
-_part_1_graph = part_1_graph
-_memory = memory
+# Lazy initialization - these will be set on first use
+_db = None
+_retriever = None
+_part_1_graph = None
+_memory = None
+
+def ensure_initialized():
+    """Lazy initialize all components on first use"""
+    global _db, _retriever, _part_1_graph, _memory
+    try:
+        if _db is None:
+            logger.info("Lazy initializing database...")
+            _db = _initialize_database()
+            logger.info("Database initialized successfully")
+        if _retriever is None:
+            logger.info("Lazy initializing retriever...")
+            _retriever = _initialize_retriever()
+            logger.info("Retriever initialized successfully")
+        if _part_1_graph is None:
+            logger.info("Lazy initializing graph...")
+            _part_1_graph = part_1_graph
+            _memory = memory
+            logger.info("Graph initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize components: {str(e)}", exc_info=True)
+        raise
+
+def get_db():
+    ensure_initialized()
+    return _db
+
+def get_retriever():
+    ensure_initialized()
+    return _retriever
+
+def get_graph():
+    ensure_initialized()
+    return _part_1_graph, _memory
 
 
 import shutil

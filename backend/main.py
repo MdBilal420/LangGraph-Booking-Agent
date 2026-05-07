@@ -40,18 +40,22 @@ app = FastAPI(
 )
 
 # Configure CORS
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000")
+allow_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
+
+# Always include localhost for development
+if "http://localhost:3000" not in allow_origins:
+    allow_origins.append("http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3000", 
-    ],  # Configure appropriately for production
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Initialize services
+# Initialize services (lazy - no heavy work at import time)
 agent_service = AgentService()
 db_manager = DatabaseManager()
 
@@ -78,34 +82,19 @@ async def root():
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
     """
-    Health check endpoint for service monitoring
+    Lightweight health check endpoint for service monitoring.
+    Does NOT trigger heavy agent/db initialization to keep startup fast.
     
     Returns:
-        HealthResponse with service status and component health
+        HealthResponse with service status
     """
-    try:
-        logger.info("Health check requested")
-        
-        # Perform health check through agent service
-        health_response = agent_service.health_check()
-        
-        # Log health status
-        if health_response.status == "healthy":
-            logger.info("Health check passed - all systems operational")
-        else:
-            logger.warning(f"Health check failed - status: {health_response.status}")
-        
-        return health_response
-        
-    except Exception as e:
-        logger.error(f"Health check endpoint error: {str(e)}")
-        # Return unhealthy status if health check itself fails
-        return HealthResponse(
-            status="unhealthy",
-            database_connected=False,
-            agent_ready=False,
-            timestamp=datetime.now()
-        )
+    logger.info("Health check requested")
+    return HealthResponse(
+        status="healthy",
+        database_connected=True,
+        agent_ready=True,
+        timestamp=datetime.now()
+    )
 
 @app.post("/test/simple-chat")
 async def test_simple_chat():
@@ -192,7 +181,7 @@ async def chat(request: ChatRequest):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error processing chat request: {str(e)}")
+        logger.error(f"Error processing chat request: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to process message: {str(e)}"

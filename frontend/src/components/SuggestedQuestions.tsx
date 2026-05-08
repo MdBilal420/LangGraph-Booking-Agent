@@ -103,7 +103,7 @@ export default function SuggestedQuestions({ onQuestionSelect, isVisible }: Sugg
         <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary/20 to-teal-500/20 flex items-center justify-center">
           <Compass size={28} className="text-primary" />
         </div>
-        <h2 className="text-xl font-semibold text-foreground mb-1.5">
+        <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-1.5">
           Your Swiss Airlines Travel Assistant
         </h2>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">

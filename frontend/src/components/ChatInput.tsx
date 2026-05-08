@@ -63,7 +63,7 @@ export default function ChatInput({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
       className={cn(
-        'px-4 py-4 border-t border-border',
+        'px-3 sm:px-4 py-3 sm:py-4 border-t border-border',
         'bg-background/80 backdrop-blur-md'
       )}
     >
@@ -88,8 +88,8 @@ export default function ChatInput({
               disabled={disabled || isLoading}
               rows={1}
               className={cn(
-                'w-full resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60',
-                'focus:outline-none disabled:opacity-50 focus-visible:outline-none focus-visible:black',
+                'w-full resize-none bg-transparent text-base sm:text-sm text-foreground placeholder:text-muted-foreground/60',
+                'focus:outline-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-0',
                 'min-h-[20px] max-h-[160px]'
               )}
               aria-label="Type your message"

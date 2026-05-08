@@ -29,9 +29,9 @@ export default function MessageList() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex-1 flex items-center justify-center"
+        className="min-h-[50vh] flex items-center justify-center"
       >
-        <div className="text-center max-w-3xl mx-auto px-4">
+        <div className="text-center">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -56,8 +56,7 @@ export default function MessageList() {
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-y-auto px-4 py-6 space-y-1 scroll-smooth max-w-3xl mx-auto w-full"
-      style={{ scrollbarGutter: 'stable' }}
+      className="py-4 sm:py-6 space-y-1"
     >
       <AnimatePresence mode="popLayout">
         {state.messages.map((message, index) => (
@@ -71,7 +70,7 @@ export default function MessageList() {
 
       <TypingIndicator isVisible={state.isTyping} />
 
-      <div ref={messagesEndRef} className="h-2" />
+      <div ref={messagesEndRef} className="h-4" />
     </div>
   );
 }

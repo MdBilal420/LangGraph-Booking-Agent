@@ -69,7 +69,7 @@ export default function ToolCallIndicator({ toolCalls, isVisible }: ToolCallIndi
                   {toolCall.result !== null && toolCall.result !== undefined && (
                     <div>
                       <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Result</span>
-                      <div className="mt-1 text-[10px] bg-background rounded-md p-2 text-foreground border border-border">
+                      <div className="mt-1 text-[10px] bg-background rounded-md p-2 text-foreground border border-border overflow-x-auto break-words">
                         {typeof toolCall.result === 'string'
                           ? String(toolCall.result)
                           : JSON.stringify(toolCall.result, null, 2)}

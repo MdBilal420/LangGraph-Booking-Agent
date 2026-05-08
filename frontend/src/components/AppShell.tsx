@@ -10,7 +10,7 @@ export default function AppShell() {
   const { state, actions } = useChat();
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
+    <div className="flex h-[100dvh] w-screen overflow-hidden bg-background text-foreground">
       {/* Main content */}
       <div className="flex flex-col flex-1 min-w-0">
         <ChatHeader

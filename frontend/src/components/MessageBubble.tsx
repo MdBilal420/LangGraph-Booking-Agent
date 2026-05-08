@@ -70,7 +70,7 @@ export default function MessageBubble({ message, isLatest = false }: MessageBubb
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05, duration: 0.3 }}
             className={cn(
-              'relative px-4 py-3 rounded-2xl shadow-sm',
+              'relative px-4 py-3 rounded-2xl shadow-sm overflow-hidden',
               'prose prose-sm max-w-none',
               isUser
                 ? 'bg-primary text-primary-foreground rounded-tr-sm'
@@ -79,7 +79,7 @@ export default function MessageBubble({ message, isLatest = false }: MessageBubb
           >
             <div
               className={cn(
-                'prose-sm max-w-none leading-relaxed',
+                'prose-sm max-w-none leading-relaxed break-words',
                 isUser
                   ? 'prose-invert [&_*]:text-primary-foreground'
                   : '[&_*]:text-card-foreground'
